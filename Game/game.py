@@ -1,5 +1,4 @@
 
-from tkinter import X
 import numpy as np
 from termcolor import colored
 
