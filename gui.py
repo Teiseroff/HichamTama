@@ -59,9 +59,10 @@ class Gui():
             playerCards = self.game.getP0c()
 
         if(inp[0] == "card") :
-                cardId = int(inp[1])
-                mirrorCard = Card(cardId)
-                print(mirrorCard.getMatrix())
+            cardId = int(inp[1])
+            mirrorCard = Card(cardId)
+            print(mirrorCard.getMatrix())
+            return 1
 
         elif(inp[0] == "play") :
             if(int(inp[1]) == playerCards[0].getId() or int(inp[1]) == playerCards[1].getId()) :
@@ -78,20 +79,28 @@ class Gui():
                 else :
                     print(colored("Mauvais format",'red'))
                     return 1  # STRAYINTURN 1
-                self.game.playCard(int(inp[1]),inputX,inputY,inputDestX,inputDestY)
-                self.draw_board()
-                return 0 # ON RETOURNE STAYINTURN 0
+                playFlag = self.game.playCard(int(inp[1]),inputX,inputY,inputDestX,inputDestY)
+                if(playFlag==1) :
+                    return 1
+                elif(playFlag==2) :
+                    return 2
+                else :
+                    self.draw_board()
+                    return 0 # ON RETOURNE STAYINTURN 0
             else :
                 print(colored("Cette carte n'est pas dans votre main !",'red'))
+                return 1
 
 
 
         elif(inp[0] == "help") :
-            print(colored("Displaying help message",'gray'))
+            print(colored("Displaying help message",'cyan'))
+            return 1
 
         elif(inp[0] == "exit") :
             print(colored("EXIT",'yellow'))
             return 2
 
         else :
-             print(colored("Commande invalide !",'red'))
+            print(colored("Commande invalide !",'red'))
+            return 1
