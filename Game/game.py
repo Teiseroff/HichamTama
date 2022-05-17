@@ -6,11 +6,8 @@ import Components.board
 import Components.piece
 from gui import Gui
 
-#from Components.board import Board
 from Components.box import Box
 from Components.card import Card
-#from Components.piece import Piece
-#from Components.player import Player
 
 
 class Game() :
@@ -79,13 +76,17 @@ class Game() :
 
         while(flag!=1) :
             flag = self.game_turn()
+            if(self.turn==1):
+                self.turn = 0
+            else :
+                self.turn = 1
 
         
     def game_turn(self) :
         
         stayInTurn = 1
 
-        while(stayInTurn == 1) :
+        while(stayInTurn != 0) :
             self.gui.call_input()
             userInput = self.gui.getInput()
             inp = userInput.split(" ")
@@ -94,8 +95,10 @@ class Game() :
             if(stayInTurn==2) :
                 return 1 # RAISE FLAG
 
+        return 0
 
-    
+        
+
 
     def distribute(self) :
         cc = Card(np.random.randint(0,16))
@@ -123,12 +126,42 @@ class Game() :
         return cc, p0c, p1c
 
 
+
+
     def playCard(self,id,x,y,x_dest,y_dest) :
-        pieceToMove = self.board.getMatrix()[x][y].getContains()
         try :
-            self.move(pieceToMove,x,y,x_dest,y_dest)
+            pieceToMove = self.board.getMatrix()[x,y].getContains()
         except :
-            print(colored("Did not managed to move piece",'red'))
+            print(colored("Index not in bounds !",'red'))
+            return 1
+
+        if(self.board.getMatrix()[x,y].isFree) :
+            print(colored("Origin box is free !",'red'))
+            return 1
+
+        if(pieceToMove.getColor()!=self.turn) :
+            print(colored("This piece is not yours!", 'red'))
+            return 1
+
+        L = [l for l in range(0,5)]
+        if(x not in L or y not in L) :
+            print(colored("Index not in bounds !",'red'))
+            return 1
+
+        M = Card(id).getMatrix()
+        relativeDest = [x_dest-x,y_dest-y]
+        a = relativeDest[0]+2
+        if(M[relativeDest[0]+2,relativeDest[1]+2]==0) :
+            print(colored("Cannot reach destination with this card !",'red'))
+            return 1
+
+        try :
+            moveFlag = self.move(pieceToMove,x,y,x_dest,y_dest)
+            if(moveFlag==2) :
+                return 2
+        except :
+            print(colored("Did not manage to move piece",'red'))
+            return 1
 
         if (self.turn == 1) :
             if (self.player1cards[0].getId() == id) :
@@ -145,13 +178,18 @@ class Game() :
                 switchCard = self.player0cards[1]
                 self.player0cards[1] = self.center_card
         self.center_card = switchCard
+        return 0
 
 
 
     def move(self,piece,x,y,x_dest,y_dest):
-        #TODO Check if out of bounds, check according to card
         mirrorMatrix = self.board.getMatrix()
+        mirrorMatrix[x,y].setContains(None)
         mirrorMatrix[x,y].setFree(True)
+        if(mirrorMatrix[x_dest,y_dest].isFree==False) :
+            winFlag = self.take(mirrorMatrix,x_dest,y_dest)
+            if(winFlag == 1):
+                return 2
         destBox = Box()
         destBox.setX(x_dest)
         destBox.setY(y_dest)
@@ -160,5 +198,18 @@ class Game() :
         mirrorMatrix[x_dest,y_dest] = destBox
 
         print(colored("moved piece " + str(x) + str(y) + " to position " + str(x_dest) + str(y_dest), 'green'))
+        return 0
 
-    
+
+
+    def take(self,M,x,y) :
+        if(M[x,y].getContains.isKing) :
+            print(colored("PLAYER "+str(self.turn)+" WON !!",'green'))
+            return 1
+        
+
+
+## BUG : taking piece destroys origin piece
+## TODO : cannot take own piece
+## TODO : reverse matrix for player 1 !
+
