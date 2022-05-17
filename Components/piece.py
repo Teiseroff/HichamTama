@@ -6,3 +6,7 @@ class Piece() :
         self.isKing = isKing
         self.color = color
 
+
+    def getColor(self) :
+        return self.color
+
