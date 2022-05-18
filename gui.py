@@ -85,7 +85,6 @@ class Gui():
                 elif(playFlag==2) :
                     return 2
                 else :
-                    self.draw_board()
                     return 0 # ON RETOURNE STAYINTURN 0
             else :
                 print(colored("Cette carte n'est pas dans votre main !",'red'))
