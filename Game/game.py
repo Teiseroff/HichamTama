@@ -71,7 +71,6 @@ class Game() :
         
         self.center_card, self.player0cards, self.player1cards = self.distribute()
 
-        self.gui.draw_board()
         flag = 0
 
         while(flag!=1) :
@@ -85,6 +84,7 @@ class Game() :
     def game_turn(self) :
         
         stayInTurn = 1
+        self.gui.draw_board()
 
         while(stayInTurn != 0) :
             self.gui.call_input()
@@ -92,6 +92,7 @@ class Game() :
             inp = userInput.split(" ")
             
             stayInTurn = self.gui.respond(inp)
+            
             if(stayInTurn==2) :
                 return 1 # RAISE FLAG
 
